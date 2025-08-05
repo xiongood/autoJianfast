@@ -1,5 +1,7 @@
 name: 更新简法主页壁纸
 on:
+  repository_dispatch:  
+    types: [manual-trigger]  
   push:
     branches: [ main ]
   schedule:
