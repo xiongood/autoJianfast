@@ -25,7 +25,7 @@ src = src.replace('@small', '@middle')
 #
 # 目标URL
 url = r"https://www.jianfast.com/home/bg/show?type=update&picurl="+src
-
+print(url)
 # 拼装Cookie（字典形式）
 headers = {
     "Cookie": "wel_code=1; u=b31de6781203a97eb0b17b388e6d91ab; Hm_lvt_7cfb32da5a4a5240b600dddec4023a51=1752626936,1752627273,1752627864,1752628707; HMACCOUNT=6B860EBD77E2A2E0; PHPSESSID=0cuvgq2qcv7hqomspotb1aefdc; Hm_lpvt_7cfb32da5a4a5240b600dddec4023a51=1752628765",
@@ -33,5 +33,6 @@ headers = {
 
 # 发送带有Cookie的GET请求
 response = requests.get(url, headers=headers)
+
 
 
