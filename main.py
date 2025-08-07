@@ -7,21 +7,24 @@ from email.mime.text import MIMEText
 # 获取第一页 图片地址
 srcs = []
 
-url = r'https://www.yaash.cn/'#主页
+# url = r'https://www.yaash.cn/'#主页
+url = r'https://www.bizhihui.com/'#主页
 response = requests.get(url)
 
 # 检查请求是否成功
 if response.status_code == 200:
-    response.encoding = 'GBK'
+    response.encoding = 'UTF-8'
     content = response.text
-    # print(content)
+    print(content)
     tree = etree.HTML(content)
-    srcs = tree.xpath("//img[contains(@style, 'object-fit: cover;')]/@src")
+    srcs = tree.xpath("//img[contains(@width, '450')]/@src")
 
+print(srcs)
 src = random.choice(srcs)
 
 # 替换
-src = src.replace('@small', '@middle')
+# src = src.replace('@small', '@middle')
+src = src.replace('-pcthumbs', '')
 
 # # 拼装Cookie（字典形式）
 headers = {
