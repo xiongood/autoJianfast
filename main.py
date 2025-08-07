@@ -7,8 +7,10 @@ from email.mime.text import MIMEText
 # 获取第一页 图片地址
 srcs = []
 
+# 在0123中取随机数
+index = random.randint(0, 3)
 # url = r'https://www.yaash.cn/'#主页
-url = r'https://www.bizhihui.com/'#主页
+url = r'https://www.bizhihui.com/page/'+str(index)#主页
 response = requests.get(url)
 
 # 检查请求是否成功
