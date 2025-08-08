@@ -8,9 +8,10 @@ from email.mime.text import MIMEText
 srcs = []
 
 # 在0123中取随机数
-index = random.randint(0, 3)
+index = random.randint(0, 5)
 # url = r'https://www.yaash.cn/'#主页
-url = r'https://www.bizhihui.com/page/'+str(index)#主页
+url = r'https://www.yaash.cn/tag/beauty/page/'+str(index+1)#主页
+# url = r'https://www.bizhihui.com/page/'+str(index)#主页
 response = requests.get(url)
 
 # 检查请求是否成功
@@ -19,16 +20,15 @@ if response.status_code == 200:
     content = response.text
     # print(content)
     tree = etree.HTML(content)
-    srcs = tree.xpath("//img[contains(@width, '450')]/@src")
+    srcs = tree.xpath("//img[contains(@style, 'object-fit: cover;')]/@src")
 
 # print(srcs)
 src = random.choice(srcs)
 
 # 替换
-# src = src.replace('@small', '@middle')
-src = src.replace('-pcthumbs', '')
+src = src.replace('@small', '@middle')
+# src = src.replace('-pcthumbs', '')
 print(src)
-
 # # 拼装Cookie（字典形式）
 headers = {
     "cookie": "wel_code=1; u=b31de6781203a97eb0b17b388e6d91ab; act=1; Hm_lvt_7cfb32da5a4a5240b600dddec4023a51=1754461713,1754461791,1754461911,1754463844; HMACCOUNT=D3BBBE66B6CCC6D8; PHPSESSID=lelo28sn929ul2pnjfhppcth03; loadingbg=https%3A//img.netbian.com/file/2024/0325/234506wB8aC.jpg; Hm_lpvt_7cfb32da5a4a5240b600dddec4023a51=1754464974",
@@ -61,4 +61,3 @@ else:
         print("邮件发送成功！")
     except Exception as e:
         print(f"发送失败: {str(e)}")
-
