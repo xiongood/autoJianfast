@@ -17,16 +17,17 @@ response = requests.get(url)
 if response.status_code == 200:
     response.encoding = 'UTF-8'
     content = response.text
-    print(content)
+    # print(content)
     tree = etree.HTML(content)
     srcs = tree.xpath("//img[contains(@width, '450')]/@src")
 
-print(srcs)
+# print(srcs)
 src = random.choice(srcs)
 
 # 替换
 # src = src.replace('@small', '@middle')
 src = src.replace('-pcthumbs', '')
+print(src)
 
 # # 拼装Cookie（字典形式）
 headers = {
@@ -60,3 +61,4 @@ else:
         print("邮件发送成功！")
     except Exception as e:
         print(f"发送失败: {str(e)}")
+
