@@ -10,7 +10,7 @@ srcs = []
 # 在0123中取随机数
 index = random.randint(0, 5)
 # url = r'https://www.yaash.cn/'#主页
-url = r'https://www.yaash.cn/tag/beauty/page/'+str(index+1)#主页
+url = r'https://www.yaash.cn/tag/girl/page/'+str(index+1)#主页
 # url = r'https://www.bizhihui.com/page/'+str(index)#主页
 response = requests.get(url)
 
@@ -61,3 +61,4 @@ else:
         print("邮件发送成功！")
     except Exception as e:
         print(f"发送失败: {str(e)}")
+
