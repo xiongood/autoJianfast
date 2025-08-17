@@ -30,4 +30,4 @@ jobs:
           pip install lxml requests
 
       - name: Run Python script
-        run: python updateHade.py ${{ github.event.client_payload.src }}
+        run: python updateHade.py ${{ github.event.client_payload.src }} ${{ secrets.GITHUBTOKEN }}
