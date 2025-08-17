@@ -5,6 +5,7 @@ import requests
 
 
 src = sys.argv[1]
+token = sys.argv[2]
 
 # 处理参数（这里只是简单展示，你可以根据需要修改）
 # print(f"你输入的参数是: {src}")
@@ -45,7 +46,7 @@ except Error as e:
 url = "https://api.github.com/repos/xiongood/autoJianfast/dispatches"
 headers = {
     "Content-Type": "application/json",
-    "Authorization": "token xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "Authorization": "token "+token,
     "Accept": "application/vnd.github.v3+json"
 }
 data = {
