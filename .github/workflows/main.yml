@@ -1,32 +1,153 @@
-name: 更新简法主页壁纸
-on:
-  repository_dispatch:
-    types: [trigger-workflow]
-  workflow_dispatch: 
-  #watch:
-    #typs: started
-  #push:
-    #branches: [ main ]
-  schedule:
-    - cron: '0,30 * * * *' 
+from lxml import etree
+import random
+import requests
+import smtplib
+from email.mime.text import MIMEText
+import mysql.connector
+from mysql.connector import Error
 
-jobs:
-  run-script:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+def connect():
+    """连接到MySQL数据库"""
+    try:
+        connection = mysql.connector.connect(
+            host='mysql2.sqlpub.com',
+            database='xiongood',
+            user='xiongood',
+            password='pdeIwVJvQivhj9Mx',
+            port = '3307'  # 使用指定的端口号
+        )
+        if connection.is_connected():
+            db_Info = connection.server_info
+            print(f"已连接到 MySQL 服务器版本: {db_Info}")
+            cursor = connection.cursor()
+            cursor.execute("select database();")
+            record = cursor.fetchone()
+            print(f"当前数据库: {record}")
+            return connection
+    except Error as e:
+        print(f"连接数据库时发生错误: {e}")
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install lxml requests
+# 查找随机图片
+def get_random_image():
+    # 获取第一页 图片地址
+    srcs = []
+    # 在0123中取随机数
+    index = random.randint(0, 5)
+    url = r'https://www.yaash.cn/tag/girl/page/'+str(index+1)#主页
+    response = requests.get(url)
 
-      - name: Run Python script
-        run: python main.py
-    
+    # 检查请求是否成功
+    if response.status_code == 200:
+        response.encoding = 'UTF-8'
+        content = response.text
+        # print(content)
+        tree = etree.HTML(content)
+        srcs = tree.xpath("//img[contains(@style, 'object-fit: cover;')]/@src")
+
+    # print(srcs)
+    src = random.choice(srcs)
+
+    # 替换
+    src = src.replace('@small', '@middle')
+    # src = src.replace('-pcthumbs', '')
+    # print(src)
+    return src
+    # return 'https://hbzoss.yaash.cn/image/afbd77f8bfe9e50b@middle'
+    # # 拼装Cookie（字典形式）
+
+# 更新图片
+def update_image(src):
+    headers = {
+        "cookie": "wel_code=1; u=b31de6781203a97eb0b17b388e6d91ab; act=1; Hm_lvt_7cfb32da5a4a5240b600dddec4023a51=1754461713,1754461791,1754461911,1754463844; HMACCOUNT=D3BBBE66B6CCC6D8; PHPSESSID=lelo28sn929ul2pnjfhppcth03; loadingbg=https%3A//img.netbian.com/file/2024/0325/234506wB8aC.jpg; Hm_lpvt_7cfb32da5a4a5240b600dddec4023a51=1754464974",
+    }
+
+    data = {
+        "bg": src
+    }
+    # 发送post请求
+    response = requests.post(r'https://www.jianfast.com/home/bg/save', data, headers=headers)
+    print(response.status_code)
+    if response.status_code == 200:
+        print("保存成功")
+    else:
+        print("保存失败")
+        # 发送邮件
+        """发送纯文字邮件"""
+        # 创建邮件内容
+        msg = MIMEText('简法壁纸发送失败' + src, 'plain', 'utf-8')
+        msg['From'] = 'java0417@163.com'
+        msg['To'] = 'xiongood@88.com'
+        msg['Subject'] = 'github Actions 通知'
+
+        try:
+            # 163邮箱的465端口需要用SMTP_SSL而非starttls
+            with smtplib.SMTP_SSL('smtp.163.com', 465) as server:
+                # 不需要调用starttls()，SSL连接本身就是加密的
+                server.login('java0417@163.com', 'HLYAyKmG4Fg4jskQ')
+                server.send_message(msg)
+            print("邮件发送成功！")
+        except Exception as e:
+            print(f"发送失败: {str(e)}")
+
+# 在数据库查询是否存在次图片
+def query_image(src):
+    connection = connect()
+    cursor = connection.cursor()
+    try:
+        select_query = "SELECT * FROM jianfast_src WHERE src = %s"
+        print(cursor)
+        cursor.execute(select_query, (src,))
+        jianfastSrc = cursor.fetchone()
+        if jianfastSrc:
+            print(f"查询到: {jianfastSrc}")
+            return jianfastSrc
+        else:
+            print(f"未找到ID为 {src} ")
+            return None
+
+    except Error as e:
+        print(f"查询用户时发生错误: {e}")
+        return None
+
+# 新增图片
+def insert_image(src):
+    """插入新用户（Create操作）"""
+    connection = connect()
+    cursor = connection.cursor()
+    try:
+        insert_query = """
+        INSERT INTO jianfast_src (src, is_Hate)
+        VALUES (%s, %s)
+        """
+        user_data = (src,0)
+        cursor.execute(insert_query, user_data)
+        connection.commit()
+        print(f"新用户已插入，ID: {cursor.lastrowid}")
+        return cursor.lastrowid
+
+    except Error as e:
+        print(f"插入用户时发生错误: {e}")
+        return None
+
+def dual():
+    src = get_random_image()
+    jianfastSrc  = query_image(src)
+    if jianfastSrc:
+        print("图片已存在")
+        hade = jianfastSrc[2]
+        if hade == 1:
+            dual()
+            return
+        else:
+            update_image(src)
+    else:
+        print("图片不存在")
+        # 保存数据库
+        insert_image(src)
+        # 修改图片
+        update_image(src)
+
+
+if __name__ == '__main__':
+    dual()
