@@ -45,7 +45,7 @@ except Error as e:
 url = "https://api.github.com/repos/xiongood/autoJianfast/dispatches"
 headers = {
     "Content-Type": "application/json",
-    "Authorization": "token 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",
+    "Authorization": "token xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     "Accept": "application/vnd.github.v3+json"
 }
 data = {
