@@ -10,6 +10,9 @@ on:
   schedule:
     - cron: '0,30 * * * *' 
 
+env:
+  TZ: Asia/Shanghai  # 设置时区为上海（东八区
+
 jobs:
   run-script:
     runs-on: ubuntu-latest
